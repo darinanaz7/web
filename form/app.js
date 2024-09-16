@@ -7,7 +7,8 @@ const nameInput = document.querySelector('.name-input');
 const passwordInput = document.querySelector('.password-input');
 let authType = 'register';
 
-alternateBtn.addEventListener('click', () => {
+alternateBtn.addEventListener('click', (e) => {
+    e.preventDefault();
     if(authType === 'register') {
         authType = "login";
         alternateBtn.textContent = "Signup";
@@ -25,10 +26,19 @@ const postData = async() => {
     try {
         const username = nameInput.value;
         const password = passwordInput.value;
-        const response = await fetch('http://localhost:3003/auth', {
+        const response = await fetch('http://localhost:3003/auth/register', {
             method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({username, password})
-        })
+        });
+
+        if(!response.ok) {
+            const result = await response.text();
+            alert(result);
+            return;
+        }
         alert('User has been created');
     } catch(err) {
         alert(err);
@@ -36,6 +46,35 @@ const postData = async() => {
     }
 }
 
-submitBtn.addEventListener('click', () => {
+const loginData = async() => {
+    try {
+        const username = nameInput.value;
+        const password = passwordInput.value;
+        const response = await fetch('http://localhost:3003/auth/login', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({username, password})
+        });
 
-})
+        if(!response.ok) {
+            const result = await response.text();
+            alert(result);
+            return;
+        }
+        alert('User has been logged in');
+    } catch(err) {
+        alert(err);
+        console.error(err);
+    }
+}
+
+submitBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if(authType === 'register') {
+        postData();
+    } else {
+        loginData();
+    }
+});
